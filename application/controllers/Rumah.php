@@ -60,22 +60,26 @@ class Rumah extends CI_Controller {
 					        <th>TIM</th>
 					        <th>Nama</th>
 					        <th>NIM/NPP/NIP</th>
-					        <th>Email</th>
 					        <th>Jenis</th>
 					        <th>Foto</th>
+					        <th>Action</th>
 					      </tr>
 					    </thead>
 					    <tbody> ';
 		foreach ($query->result() as $row){
 			$query2 = $this->db->query("select * from peserta where id = ".$row->id_peserta);
-			$rowx = $query2->row();  
+			$rowx = $query2->row(); 
+			 $foto = 'user.png';
+			if ($row->foto<>''){
+				$foto = $row->foto;
+			}
 			$eko .=' <tr>
 					        <td>'.$rowx->tim.'</td>
 					        <td>'.$row->nama.'</td>
 					        <td>'.$row->npm.'</td>
-					        <td>'.$row->email.'</td>
 					        <td>'.$row->jenis.'</td>
-					        <td>'.$row->foto.'</td>
+					        <td><img src="'.base_url().'uploads/'.$foto.'" class="img-thumbnail" alt="'.$row->nama.'" width="50" </td>
+					        <td><a href="#"  <span class="glyphicon glyphicon-print">detail</span></a>&nbsp;|&nbsp; <a href="'.base_url().'index.php/rumah/hapus_anggota?kdid='.$row->id.'&kduniv='.$value.'" onclick="return confirm(\'Anda yakin data ini akan di hapus?\');" <span class="glyphicon glyphicon-erase">dell</span></a></td>
 					      </tr>';
 		
 
@@ -127,7 +131,7 @@ class Rumah extends CI_Controller {
                         $error = array('error' => $this->upload->display_errors());
 
                         var_dump($error);
-                        
+
                 		redirect('/rumah/data_peserta?kduniv='.$this->input->post('id_univ'));
                 }
                 else
@@ -170,5 +174,14 @@ class Rumah extends CI_Controller {
 			);
 
 			$this->parser->parse('home_v2', $data);
-	        }
+	    }
+	    public function hapus_anggota()
+	    {
+	    	$value = $this->input->get('kdid');
+	    	$id_univ = $this->input->get('kduniv');
+	    	$this->db->where('id', $value);
+			$this->db->delete('anggota');
+			redirect('/rumah/data_peserta?kduniv='.$id_univ);
+
+	    }
 }
